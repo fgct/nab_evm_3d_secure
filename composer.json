@@ -1,0 +1,22 @@
+{
+    "name": "fgct/nab_evm_3d_secure",
+    "description": "EMV 3D secure package",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["Nab EVM 3D secure", "NAB", "3D secure"],
+    "homepage": "https://github.com/Seldaek/monolog",
+    "autoload": {
+        "psr-4": {
+            "Fgc\\NabEvm3dSecure\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "khoazero123",
+            "email": "khoazero123@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
