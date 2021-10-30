@@ -1,11 +1,13 @@
 <?php
+
 namespace Fgc\NabEvm3dSecure;
 
 use Exception;
 use SimpleXMLElement;
 use Fgc\NabEvm3dSecure\Order;
 
-class Auth {
+class Auth
+{
 
 	const MODE_PRODUCTION = 'production';
 	const MODE_TEST = 'sandbox';
@@ -29,7 +31,8 @@ class Auth {
 	 *
 	 * @return Auth An Auth instance
 	 */
-	public function __construct($mode, $merchant_id, $merchant_password) {
+	public function __construct($mode, $merchant_id, $merchant_password)
+	{
 		if (!in_array($mode, [self::MODE_PRODUCTION, self::MODE_TEST])) {
 			throw new Exception('MODE must one of type: production or sandbox');
 		}
@@ -46,7 +49,8 @@ class Auth {
 	 * @param array $params ['ip', 'amount', 'currency', 'orderType', 'intents']
 	 * @return Order|Exception An Order instance or throw Exception
 	 */
-	public function createOrder($params) {
+	public function createOrder($params)
+	{
 		if (!isset($params['amount'])) {
 			throw new Exception('Missing amount param');
 		}
@@ -70,7 +74,7 @@ class Auth {
 		if (!$this->isInit()) {
 			throw new Exception('Auth is not init');
 		}
-		
+
 		$url = $this->isProductionMode() ? self::URL_EVM_3D_LIVE : self::URL_EVM_3D_TEST;
 
 		// Build request arguments.
@@ -103,7 +107,8 @@ class Auth {
 	 * 
 	 * @return SimpleXMLElement | Exception
 	 */
-	public function processTransaction($data) {
+	public function processTransaction($data)
+	{
 		$url = $this->isProductionMode() ? self::URL_NAB_PAYMENT_LIVE : self::URL_NAB_PAYMENT_TEST;
 
 		list($month, $year) = explode('/', $data['expiryDate']);
@@ -126,7 +131,7 @@ class Auth {
 		$xml = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><NABTransactMessage/>');
 		$MessageInfo = $xml->addChild('MessageInfo');
 		$MessageInfo->addChild('messageID', substr(md5(time()), 0, 30));
-		$MessageInfo->addChild('messageTimestamp', date('YdmHisv000').'+660');
+		$MessageInfo->addChild('messageTimestamp', date('YdmHisv000') . '+660');
 		$MessageInfo->addChild('timeoutValue', 60); // Minimum "60"
 		$MessageInfo->addChild('apiVersion', 'xml-4.2');
 		$MerchantInfo = $xml->addChild('MerchantInfo');
@@ -182,10 +187,10 @@ class Auth {
 			$CreditCardInfo->addChild('DirectoryServerTransactionId', $data['DirectoryServerTransactionId']);
 		}
 		$CreditCardInfo->addChild('cardNumber', $data['cardNumber']);
-		$CreditCardInfo->addChild('expiryDate', $month.'/'.$year);
+		$CreditCardInfo->addChild('expiryDate', $month . '/' . $year);
 		$CreditCardInfo->addChild('cardHolderName', $data['cardHolderName']);
 		$CreditCardInfo->addChild('recurringflag', $data['recurringflag']);
-		
+
 		$xml_content = $xml->asXML();
 		$response = $this->request('POST', $url, $xml_content, 'xml');
 
@@ -200,21 +205,23 @@ class Auth {
 					case '08': // Approved
 						break;
 					default:
-						throw new Exception($response->Payment->TxnList->Txn->responseCode.': '.$response->Payment->TxnList->Txn->responseText);
+						throw new Exception($response->Payment->TxnList->Txn->responseCode . ': ' . $response->Payment->TxnList->Txn->responseText);
 						break;
 				}
 				break;
 			default:
-				throw new Exception($response->Status->statusCode.': '.$response->Status->statusDescription);
+				throw new Exception($response->Status->statusCode . ': ' . $response->Status->statusDescription);
 		}
 		return $response->Payment->TxnList->Txn;
 	}
 
-	public function isInit() {
+	public function isInit()
+	{
 		return !empty($this->merchant_id) && !empty($this->merchant_password);
 	}
 
-	public function isProductionMode() {
+	public function isProductionMode()
+	{
 		return $this->mode == self::MODE_PRODUCTION;
 	}
 
@@ -228,7 +235,8 @@ class Auth {
 	 *
 	 * @return mixed
 	 */
-	function request($method, $url, $data = false, $decode = false) {
+	function request($method, $url, $data = false, $decode = false)
+	{
 		$ch = curl_init();
 
 		switch ($method) {
@@ -250,7 +258,7 @@ class Auth {
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		if ($this->isInit()) {
 			curl_setopt($ch, CURLOPT_HTTPHEADER, [
-				'Authorization: Basic '.base64_encode($this->merchant_id . ":" . $this->merchant_password),
+				'Authorization: Basic ' . base64_encode($this->merchant_id . ":" . $this->merchant_password),
 				'Accept: application/json',
 				'Content-Type: application/json',
 			]);
@@ -268,19 +276,20 @@ class Auth {
 		return $response;
 	}
 
-	private function get_client_ip() {
-		if ( getenv( 'HTTP_CLIENT_IP' ) ) {
-			$ip_address = getenv( 'HTTP_CLIENT_IP' );
-		} elseif ( getenv( 'HTTP_X_FORWARDED_FOR' ) ) {
-			$ip_address = getenv( 'HTTP_X_FORWARDED_FOR' );
-		} elseif ( getenv( 'HTTP_X_FORWARDED' ) ) {
-			$ip_address = getenv( 'HTTP_X_FORWARDED' );
-		} elseif ( getenv( 'HTTP_FORWARDED_FOR' ) ) {
-			$ip_address = getenv( 'HTTP_FORWARDED_FOR' );
-		} elseif ( getenv( 'HTTP_FORWARDED' ) ) {
-			$ip_address = getenv( 'HTTP_FORWARDED' );
-		} elseif ( getenv( 'REMOTE_ADDR' ) ) {
-			$ip_address = getenv( 'REMOTE_ADDR' );
+	private function get_client_ip()
+	{
+		if (getenv('HTTP_CLIENT_IP')) {
+			$ip_address = getenv('HTTP_CLIENT_IP');
+		} elseif (getenv('HTTP_X_FORWARDED_FOR')) {
+			$ip_address = getenv('HTTP_X_FORWARDED_FOR');
+		} elseif (getenv('HTTP_X_FORWARDED')) {
+			$ip_address = getenv('HTTP_X_FORWARDED');
+		} elseif (getenv('HTTP_FORWARDED_FOR')) {
+			$ip_address = getenv('HTTP_FORWARDED_FOR');
+		} elseif (getenv('HTTP_FORWARDED')) {
+			$ip_address = getenv('HTTP_FORWARDED');
+		} elseif (getenv('REMOTE_ADDR')) {
+			$ip_address = getenv('REMOTE_ADDR');
 		} else {
 			$ip_address = '';
 		}

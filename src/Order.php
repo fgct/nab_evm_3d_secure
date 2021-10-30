@@ -1,155 +1,158 @@
 <?php
+
 namespace Fgc\NabEvm3dSecure;
 
-class Order {
+class Order
+{
 
-    /**
-     * Order ID.
-     * A unique id generated for EMV 3D Secure Order.
-     * Format type: String, LEN=36
-     *
-     * @access public
-     *
-     * @var string $orderId Order ID
-     */
-    public $orderId;
+	/**
+	 * Order ID.
+	 * A unique id generated for EMV 3D Secure Order.
+	 * Format type: String, LEN=36
+	 *
+	 * @access public
+	 *
+	 * @var string $orderId Order ID
+	 */
+	public $orderId;
 
-    /**
-     * Order Token
-     * A bearer token used to authenticate calls from browser. 
-     *
-     * @access public
-     *
-     * @var string $orderToken Order Token
-     */
-    public $orderToken;
+	/**
+	 * Order Token
+	 * A bearer token used to authenticate calls from browser. 
+	 *
+	 * @access public
+	 *
+	 * @var string $orderToken Order Token
+	 */
+	public $orderToken;
 
-    /**
-     * A shortened authentication token.
-     * The token is used to authenticate calls from browser. 
-     *
-     * @access public
-     *
-     * @var string $simpleToken Simple Token
-     */
-    public $simpleToken;
+	/**
+	 * A shortened authentication token.
+	 * The token is used to authenticate calls from browser. 
+	 *
+	 * @access public
+	 *
+	 * @var string $simpleToken Simple Token
+	 */
+	public $simpleToken;
 
-    /**
-     * Transaction amount in cents. 
-     * Returned unchanged from the request.
-     *
-     * @access public
-     *
-     * @var string $amount Amount
-     */
-    public $amount;
-    
-    /**
-     * Transaction currency.
-     * Returned unchanged from the request.
-     *
-     * @access public
-     *
-     * @var string $currency Currency
-     */
-    public $currency;
+	/**
+	 * Transaction amount in cents. 
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $amount Amount
+	 */
+	public $amount;
 
-    /**
-     * Order Type.
-     * Returned unchanged from the request.
-     *
-     * @access public
-     *
-     * @var string $orderType Order Type
-     */
-    public $orderType;
+	/**
+	 * Transaction currency.
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $currency Currency
+	 */
+	public $currency;
 
-    /**
-     * Order Status.
-     * Returns ‘NEW’ after EMV 3D Secure order creation
-     *
-     * @access public
-     *
-     * @var string $status Status
-     */
-    public $status;
+	/**
+	 * Order Type.
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $orderType Order Type
+	 */
+	public $orderType;
 
-    /**
-     * Merchant ID.
-     * Returned unchanged from the request.
-     *
-     * @access public
-     *
-     * @var string $merchantId Merchant ID.
-     */
-    public $merchantId;
+	/**
+	 * Order Status.
+	 * Returns ‘NEW’ after EMV 3D Secure order creation
+	 *
+	 * @access public
+	 *
+	 * @var string $status Status
+	 */
+	public $status;
 
-    /**
-     * Merchant Order Reference.
-     * A merchant assigned reference to identify the order
-     * Returned unchanged from the request.
-     *
-     * @access public
-     *
-     * @var string $merchantOrderReference Merchant Order Reference
-     */
-    public $merchantOrderReference;
+	/**
+	 * Merchant ID.
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $merchantId Merchant ID.
+	 */
+	public $merchantId;
 
-    /**
-     * Provider Client Id.
-     * The client Id assigned to the merchant by the EMV 3D Secure provider.
-     *
-     * @access public
-     *
-     * @var string $providerClientId Provider Client Id
-     */
-    public $providerClientId;
+	/**
+	 * Merchant Order Reference.
+	 * A merchant assigned reference to identify the order
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $merchantOrderReference Merchant Order Reference
+	 */
+	public $merchantOrderReference;
 
-    /**
-     * Session Id.
-     * A unique session id.
-     *
-     * @access public
-     *
-     * @var string $sessionId Session Id
-     */
-    public $sessionId;
+	/**
+	 * Provider Client Id.
+	 * The client Id assigned to the merchant by the EMV 3D Secure provider.
+	 *
+	 * @access public
+	 *
+	 * @var string $providerClientId Provider Client Id
+	 */
+	public $providerClientId;
 
-    /**
-     * Purpose of creating the order.
-     * Returned unchanged from the request.
-     *
-     * @access public
-     *
-     * @var string $intents THREED_SECURE
-     */
-    public $intents;
+	/**
+	 * Session Id.
+	 * A unique session id.
+	 *
+	 * @access public
+	 *
+	 * @var string $sessionId Session Id
+	 */
+	public $sessionId;
 
-    /**
+	/**
+	 * Purpose of creating the order.
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $intents THREED_SECURE
+	 */
+	public $intents;
+
+	/**
 	 * Init Auth class
 	 *
 	 * @param array $response
 	 *
 	 * @return Order An Order instance
 	 */
-    public function __construct($response) {
-        $this->orderId = $response["orderId"];
-        $this->orderToken = $response["orderToken"];
-        $this->simpleToken = $response["simpleToken"];
-        $this->amount = $response["amount"];
-        $this->currency = $response["currency"];
-        $this->orderType = $response["orderType"];
-        $this->status = $response["status"];
-        $this->merchantId = $response["merchantId"];
-        if (isset($response["threedSecure"])) {
-          $this->providerClientId = $response["threedSecure"]["providerClientId"];
-          $this->sessionId = $response["threedSecure"]["sessionId"];
-        }
-        $this->intents = $response["intents"];
-        if (isset($response['merchantOrderReference'])) {
-          $this->merchantOrderReference = $response["merchantOrderReference"];
-        }
+	public function __construct($response)
+	{
+		$this->orderId = $response["orderId"];
+		$this->orderToken = $response["orderToken"];
+		$this->simpleToken = $response["simpleToken"];
+		$this->amount = $response["amount"];
+		$this->currency = $response["currency"];
+		$this->orderType = $response["orderType"];
+		$this->status = $response["status"];
+		$this->merchantId = $response["merchantId"];
+		if (isset($response["threedSecure"])) {
+			$this->providerClientId = $response["threedSecure"]["providerClientId"];
+			$this->sessionId = $response["threedSecure"]["sessionId"];
+		}
+		$this->intents = $response["intents"];
+		if (isset($response['merchantOrderReference'])) {
+			$this->merchantOrderReference = $response["merchantOrderReference"];
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 }
