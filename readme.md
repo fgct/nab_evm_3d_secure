@@ -16,13 +16,14 @@ use Fgc\NabEvm3dSecure\Auth;
 $auth = new Auth(Auth::MODE_TEST, 'XYZ0010', 'abcd1234');
 
 try {
+	echo "Creating order for EVM 3D secure authentication...\n";
 	$order = $auth->createOrder([
 		'amount' => 10, // In dollar
 		'currency' => 'AUD',
 		'ip' => '203.89.101.20'
 	]);
 	var_export($order);
-	/* $order = array(
+	/* $order = (Fgc\NabEvm3dSecure\Order) array(
 		'orderId' => '3b5ce3e2-c55f-4f9d-a252-405b832d8f5d',
 		'orderToken' => 'eyJjdHkiOiJKV1QiL...Yy9hObH5kn6bNQ==',
 		'amount' => 10,
@@ -40,6 +41,7 @@ try {
 }
 
 try {
+	echo "\nProcessing transaction...\n";
 	$result = $auth->processTransaction([
 		'amount' => '10',
 		'purchaseOrderNo' => 'ORDER_#0001',
@@ -50,8 +52,8 @@ try {
 		'SLI' => '02', // eci - E-Commerce Indicator/Security Level Indicator(SLI)
 	]);
 	var_export($result);
-	/* $result = (object) array(
-   'txnType' => '0',
+	/* $result = (Fgc\NabEvm3dSecure\Transaction) array(
+	 'txnType' => '0',
    'txnSource' => '23',
    'amount' => '1000',
    'currency' => 'AUD',
@@ -62,13 +64,7 @@ try {
    'settlementDate' => '20211030',
    'txnID' => '183917',
    'authID' => '429589',
-   'CreditCardInfo' => array(
-     'pan' => '444433...111',
-     'expiryDate' => '10/23',
-     'cardType' => '6',
-     'cardDescription' => 'Visa',
-  	)
- ); */
+	 ); */
 } catch (\Exception $e) {
 	echo $e->getMessage();
 }

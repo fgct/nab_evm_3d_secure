@@ -4,7 +4,6 @@ namespace Fgc\NabEvm3dSecure;
 
 use Exception;
 use SimpleXMLElement;
-use Fgc\NabEvm3dSecure\Order;
 
 class Auth
 {
@@ -105,7 +104,7 @@ class Auth
 	 * @var $data[SLI] string, required - E-Commerce Indicator/Security Level Indicator(SLI).
 	 * @var $data[xID] string, optional - 3D Secure Transaction ID.
 	 * 
-	 * @return SimpleXMLElement | Exception
+	 * @return Transaction | Exception
 	 */
 	public function processTransaction($data)
 	{
@@ -212,7 +211,7 @@ class Auth
 			default:
 				throw new Exception($response->Status->statusCode . ': ' . $response->Status->statusDescription);
 		}
-		return $response->Payment->TxnList->Txn;
+		return new Transaction((array) $response->Payment->TxnList->Txn);
 	}
 
 	public function isInit()
