@@ -4,11 +4,11 @@ require_once(__DIR__ . '/vendor/autoload.php');
 use Fgc\NabEvm3dSecure\Auth;
 
 $auth = new Auth(Auth::MODE_TEST, 'XYZ0010', 'abcd1234');
-
+$auth->useDollar();
 try {
 	echo "Creating order for EVM 3D secure authentication...\n";
 	$order = $auth->createOrder([
-		'amount' => 10, // In dollar
+		'amount' => '10.08', // In dollar
 		'currency' => 'AUD',
 		'ip' => '203.89.101.20'
 	]);
@@ -33,7 +33,7 @@ try {
 try {
 	echo "\nProcessing transaction...\n";
 	$result = $auth->processTransaction([
-		'amount' => '10',
+		'amount' => '10.08',
 		'purchaseOrderNo' => 'ORDER_#0001',
 		'cardNumber' => '4444333322221111',
 		'cardHolderName' => 'TEST TEST',

@@ -37,7 +37,7 @@ class Order
 	public $simpleToken;
 
 	/**
-	 * Transaction amount in cents. 
+	 * Transaction amount. 
 	 * Returned unchanged from the request.
 	 *
 	 * @access public
@@ -45,6 +45,26 @@ class Order
 	 * @var string $amount Amount
 	 */
 	public $amount;
+
+	/**
+	 * Transaction amount in cents. 
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $amountInCents Amount
+	 */
+	public $amountInCents;
+
+	/**
+	 * Transaction amount in dollar. 
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $amountInDollar Amount
+	 */
+	public $amountInDollar;
 
 	/**
 	 * Transaction currency.
@@ -140,6 +160,8 @@ class Order
 		$this->orderToken = $response["orderToken"];
 		$this->simpleToken = $response["simpleToken"];
 		$this->amount = $response["amount"];
+		$this->amountInCents = $response["amount"];
+		$this->amountInDollar = $response["amount"] / 100;
 		$this->currency = $response["currency"];
 		$this->orderType = $response["orderType"];
 		$this->status = $response["status"];

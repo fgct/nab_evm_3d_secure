@@ -20,6 +20,7 @@ class Auth
 	private $mode;
 	private $merchant_id;
 	private $merchant_password;
+	private $useDollar = true;
 
 	/**
 	 * Init Auth class
@@ -43,6 +44,18 @@ class Auth
 	}
 
 	/**
+	 * Input amount unit: cent or dollar, default is dollar
+	 *
+	 * @param bool $bool true | false
+	 *
+	 * @return void
+	 */
+	public function useDollar($bool = true) {
+		$this->useDollar = $bool;
+		return $this;
+	}
+
+	/**
 	 * Create order method
 	 *
 	 * @param array $params ['ip', 'amount', 'currency', 'orderType', 'intents']
@@ -52,6 +65,10 @@ class Auth
 	{
 		if (!isset($params['amount'])) {
 			throw new Exception('Missing amount param');
+		}
+		$params['amount'] = floatval($params['amount']);
+		if ($this->useDollar) {
+			$params['amount'] = $params['amount'] * 100;
 		}
 		if (!isset($params['currency'])) {
 			$params['currency'] = 'AUD';
@@ -81,7 +98,11 @@ class Auth
 
 		if (!empty($response)) {
 			if (isset($response["orderToken"])) {
-				return new Order($response);
+				$order = new Order($response);
+				if ($this->useDollar) {
+					$order->amount = $order->amountInDollar;
+				}
+				return $order;
 			}
 			if (isset($response["errors"]) && count($response["errors"])) {
 				throw new Exception(json_encode($response["errors"][0]));
@@ -144,7 +165,11 @@ class Auth
 		$Txn->addAttribute('ID', 1);
 		$Txn->addChild('txnType', $data['txnType']);
 		$Txn->addChild('txnSource', $data['txnSource']);
-		$Txn->addChild('amount', $data['amount'] * 100);
+		if ($this->useDollar) {
+			$Txn->addChild('amount', $data['amount'] * 100);
+		} else { // cents
+			$Txn->addChild('amount', $data['amount']);
+		}
 		$Txn->addChild('currency', $data['currency']);
 		$Txn->addChild('purchaseOrderNo', $data['purchaseOrderNo']);
 		if (isset($data['txnID'])) {
@@ -211,7 +236,11 @@ class Auth
 			default:
 				throw new Exception($response->Status->statusCode . ': ' . $response->Status->statusDescription);
 		}
-		return new Transaction((array) $response->Payment->TxnList->Txn);
+		$transaction = new Transaction((array) $response->Payment->TxnList->Txn);
+		if ($this->useDollar) {
+			$transaction->amount = $transaction->amountInDollar;
+		}
+		return $transaction;
 	}
 
 	public function isInit()

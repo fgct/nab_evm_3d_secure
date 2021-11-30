@@ -26,7 +26,7 @@ class Transaction
 	public $txnSource;
 
 	/**
-	 * Transaction amount in cents. 
+	 * Transaction amount. 
 	 * Returned unchanged from the request.
 	 *
 	 * @access public
@@ -34,6 +34,26 @@ class Transaction
 	 * @var string $amount Amount
 	 */
 	public $amount;
+
+	/**
+	 * Transaction amount in cents. 
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $amountInCents Amount
+	 */
+	public $amountInCents;
+
+	/**
+	 * Transaction amount in dollar. 
+	 * Returned unchanged from the request.
+	 *
+	 * @access public
+	 *
+	 * @var string $amountInDollar Amount
+	 */
+	public $amountInDollar;
 
 	/**
 	 * Transaction currency.
@@ -127,6 +147,8 @@ class Transaction
 		$this->txnType = $response["txnType"];
 		$this->txnSource = $response["txnSource"];
 		$this->amount = $response["amount"];
+		$this->amountInCents = $response["amount"];
+		$this->amountInDollar = $response["amount"] / 100;
 		$this->currency = $response["currency"];
 		$this->purchaseOrderNo = $response["purchaseOrderNo"];
 		$this->approved = $response["approved"];
