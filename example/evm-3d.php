@@ -31,7 +31,7 @@ try {
 }
 
 try {
-	echo "\nProcessing transaction...\n";
+	echo "\n\nProcessing transaction...\n";
 	$result = $auth->processTransaction([
 		'amount' => '10.08',
 		'purchaseOrderNo' => 'ORDER_#0001',

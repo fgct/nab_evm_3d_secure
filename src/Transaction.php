@@ -133,6 +133,18 @@ class Transaction
 	 */
 	public $txnID;
 
+	/**
+	 * This is the authorisation code of a preauthorisation transaction.
+	 * It will not be returned if the transaction is not a Preauthorisation
+	 * or has not been processed, or in some cases if the preauthorisation
+	 * was not received by NAB.
+	 *
+	 * @access public
+	 *
+	 * @var string $preauthID pre authorisation ID
+	 */
+	public $preauthID;
+
 	public $authID;
 
 	/**
@@ -144,19 +156,14 @@ class Transaction
 	 */
 	public function __construct($response)
 	{
-		$this->txnType = $response["txnType"];
-		$this->txnSource = $response["txnSource"];
-		$this->amount = $response["amount"];
+		foreach ($response as $key => $value) {
+			if (property_exists($this, $key)) {
+				$this->{$key} = $value;
+			}
+		}
+
 		$this->amountInCents = $response["amount"];
 		$this->amountInDollar = $response["amount"] / 100;
-		$this->currency = $response["currency"];
-		$this->purchaseOrderNo = $response["purchaseOrderNo"];
-		$this->approved = $response["approved"];
-		$this->responseCode = $response["responseCode"];
-    $this->responseText = $response["responseText"];
-    $this->settlementDate = $response["settlementDate"];
-		$this->txnID = $response["txnID"];
-		$this->authID = $response["authID"];
 
 		return $this;
 	}

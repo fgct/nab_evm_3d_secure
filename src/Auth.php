@@ -115,6 +115,54 @@ class Auth
 	 * @param array $data
 	 * 
 	 * @var $data[amount] int, required
+	 * @var $data[purchaseOrderNo] string, required
+	 * @var $data[cardNumber] string, required
+	 * @var $data[cardHolderName] string, required
+	 * @var $data[expiryDate] string, required, eg: 02/24
+	 * @var $data[cvv] string, optional - Card CVV
+	 * @var $data[CAVV] string, required - Authentication Value.
+	 * @var $data[SLI] string, required - E-Commerce Indicator/Security Level Indicator(SLI).
+	 * @var $data[xID] string, optional - 3D Secure Transaction ID.
+	 * 
+	 * @return Transaction | Exception
+	 */
+	public function accountVerification($data)
+	{
+		$data['txnType'] = '40';
+		$data['amount'] = '0';
+		if (isset($data['currency'])) {
+			unset($data['currency']);
+		}
+		return $this->processTransaction($data);
+	}
+
+	/**
+	 * @param array $data
+	 * 
+	 * @var $data[amount] int, required
+	 * @var $data[currency] string, required, eg: AUD
+	 * @var $data[purchaseOrderNo] string, required
+	 * @var $data[cardNumber] string, required
+	 * @var $data[cardHolderName] string, required
+	 * @var $data[expiryDate] string, required, eg: 02/24
+	 * @var $data[cvv] string, optional - Card CVV
+	 * @var $data[CAVV] string, required - Authentication Value.
+	 * @var $data[SLI] string, required - E-Commerce Indicator/Security Level Indicator(SLI).
+	 * @var $data[xID] string, optional - 3D Secure Transaction ID.
+	 * 
+	 * @return Transaction | Exception
+	 */
+	public function preAuthorise($data)
+	{
+		$data['txnType'] = '10';
+		$data['initialAuth'] = 'yes';
+		return $this->processTransaction($data);
+	}
+
+	/**
+	 * @param array $data
+	 * 
+	 * @var $data[amount] int, required
 	 * @var $data[currency] string, required, eg: AUD
 	 * @var $data[purchaseOrderNo] string, required
 	 * @var $data[cardNumber] string, required
@@ -227,6 +275,8 @@ class Auth
 				switch ($response->Payment->TxnList->Txn->responseCode) {
 					case '00': // Approved
 					case '08': // Approved
+					case '11': // Approved (not used)
+					case '16': // Approved (not used)
 						break;
 					default:
 						throw new Exception($response->Payment->TxnList->Txn->responseCode . ': ' . $response->Payment->TxnList->Txn->responseText);

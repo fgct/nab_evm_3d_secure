@@ -156,16 +156,15 @@ class Order
 	 */
 	public function __construct($response)
 	{
-		$this->orderId = $response["orderId"];
-		$this->orderToken = $response["orderToken"];
-		$this->simpleToken = $response["simpleToken"];
-		$this->amount = $response["amount"];
+		foreach ($response as $key => $value) {
+			if (property_exists($this, $key)) {
+				$this->{$key} = $value;
+			}
+		}
+
 		$this->amountInCents = $response["amount"];
 		$this->amountInDollar = $response["amount"] / 100;
-		$this->currency = $response["currency"];
-		$this->orderType = $response["orderType"];
-		$this->status = $response["status"];
-		$this->merchantId = $response["merchantId"];
+
 		if (isset($response["threedSecure"])) {
 			$this->providerClientId = $response["threedSecure"]["providerClientId"];
 			$this->sessionId = $response["threedSecure"]["sessionId"];
