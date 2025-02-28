@@ -7,7 +7,6 @@ use SimpleXMLElement;
 
 class Auth
 {
-
 	const MODE_PRODUCTION = 'production';
 	const MODE_TEST = 'sandbox';
 
@@ -21,6 +20,16 @@ class Auth
 	private $merchant_id;
 	private $merchant_password;
 	private $useDollar = true;
+
+	/**
+	 * @var mixed
+	 */
+	private $request_data;
+
+	/**
+	 * @var mixed
+	 */
+	private $response_data;
 
 	/**
 	 * Init Auth class
@@ -74,7 +83,7 @@ class Auth
 			$params['currency'] = 'AUD';
 		}
 		if (!isset($params['ip'])) {
-			$params['ip'] = $this->get_client_ip();
+			$params['ip'] = self::get_client_ip();
 			/* if (!$params['ip']) {
 				throw new Exception('Can not get client IP address');
 			} */
@@ -93,8 +102,9 @@ class Auth
 
 		$url = $this->isProductionMode() ? self::URL_EVM_3D_LIVE : self::URL_EVM_3D_TEST;
 
-		// Build request arguments.
+		$this->request_data = $params;
 		$response = $this->request('POST', $url, json_encode($params), 'array');
+		$this->response_data = $response;
 
 		if (!empty($response)) {
 			if (isset($response["orderToken"])) {
@@ -264,7 +274,9 @@ class Auth
 		$CreditCardInfo->addChild('recurringflag', $data['recurringflag']);
 
 		$xml_content = $xml->asXML();
+		$this->request_data = $xml;
 		$response = $this->request('POST', $url, $xml_content, 'xml');
+		$this->response_data = $response;
 
 		if (!isset($response->Status->statusCode) || !$response->Status->statusCode || !isset($response->Payment->TxnList->Txn)) {
 			throw new Exception(json_encode($response));
@@ -354,7 +366,17 @@ class Auth
 		return $response;
 	}
 
-	private function get_client_ip()
+	public function getRequestData()
+	{
+		return $this->request_data;
+	}
+
+	public function getResponseData()
+	{
+		return $this->response_data;
+	}
+
+	public static function get_client_ip()
 	{
 		if (getenv('HTTP_CLIENT_IP')) {
 			$ip_address = getenv('HTTP_CLIENT_IP');
